@@ -69,7 +69,6 @@ body{
     position: relative;
     align-items: center;
 }
-
 .forecast {
     display: flex;
     margin-top: 20px;
