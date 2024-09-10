@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
-//Enter key triggers click of search button
+//enter key triggers click of search button
     searchInput.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
           event.preventDefault();
@@ -35,10 +35,6 @@ $(document).ready(function () {
                 let long = (location).x;
                 let latitude = `latitude=${lat}`;
                 let longitude = `longitude=${long}`;
-                         
-
-
-
 
             $.ajax({
             //Hourly weather forecast from datahub using obtained co-ordinates
@@ -90,8 +86,6 @@ $(document).ready(function () {
                     dayOfWeek = d.toFormat('ccc');
                     let element_day = $(`#dayName${day+1}`);
                     element_day.html(dayOfWeek);
-            
-                    element_day.attr('id', `${dayOfWeek}`);
                 }
             
                 //days of the week for today and next 5 days
@@ -106,22 +100,24 @@ $(document).ready(function () {
                 function forecast(day) {
                 
                     const daily = daily_result.features[0].properties.timeSeries[day+1];
-                
+                //high temp
                     let high_temp = (daily).dayMaxScreenTemperature;
                     high_temp = Math.round(high_temp);
                     let element1 = $(`#${day+1}HighTemp`);
                     element1.html(`${high_temp}°C`);
-                        
+
+                //up arrow        
                     let element1_img = $(`#up${day+1}`);
                     element1_img.html();
                     element1_img.attr('src', `images/up-arrow.png`);
 
-                        
+                //low temp        
                     let low_temp = (daily).nightMinScreenTemperature;
                     low_temp = Math.round(low_temp);
                     let element2 = $(`#${day+1}LowTemp`);
                     element2.html(`${low_temp}°C`);
-
+                    
+                //down arrow
                     let element2_img = $(`#down${day+1}`);
                     element2_img.html();
                     element2_img.attr('src', `images/down-arrow.png`);                        
