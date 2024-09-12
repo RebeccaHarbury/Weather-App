@@ -77,7 +77,7 @@ function get_daily_data(lat,lon){
 }
 
 //Obtain current temp and sig. weather code for today from data hub, and append relevant data
-function get_hourly_forecast(){
+function get_hourly_forecast(hourly_result){
         
     const hourly = hourly_result.features[0].properties.timeSeries[2];
         
