@@ -1,198 +1,171 @@
-$(document).ready(function () {
-    $.ajax({
-    //Hourly weather forecast from datahub
-        url: "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly?latitude=50.727239&longitude=-3.475277",
-        headers: {
-            "apikey": 'eyJ4NXQiOiJOak16WWpreVlUZGlZVGM0TUdSalpEaGtaV1psWWpjME5UTXhORFV4TlRZM1ptRTRZV1JrWWc9PSIsImtpZCI6ImdhdGV3YXlfY2VydGlmaWNhdGVfYWxpYXMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJyZWJlY2NhLmhhcmJ1cnlAbWV0b2ZmaWNlLmdvdi51a0BjYXJib24uc3VwZXIiLCJhcHBsaWNhdGlvbiI6eyJvd25lciI6InJlYmVjY2EuaGFyYnVyeUBtZXRvZmZpY2UuZ292LnVrIiwidGllclF1b3RhVHlwZSI6bnVsbCwidGllciI6IlVubGltaXRlZCIsIm5hbWUiOiJzaXRlX3NwZWNpZmljLWI4ZmM2NTUxLWU2MGEtNGI1My04Mzk5LTY1NTVkODczMjdhZiIsImlkIjo2MTI4LCJ1dWlkIjoiMDRjMTE0MWYtZDA2YS00NDM1LWI0YWMtMWE5MTY2YjdmN2YxIn0sImlzcyI6Imh0dHBzOlwvXC9hcGktbWFuYWdlci5hcGktbWFuYWdlbWVudC5tZXRvZmZpY2UuY2xvdWQ6NDQzXC9vYXV0aDJcL3Rva2VuIiwidGllckluZm8iOnsid2RoX3NpdGVfc3BlY2lmaWNfZnJlZSI6eyJ0aWVyUXVvdGFUeXBlIjoicmVxdWVzdENvdW50IiwiZ3JhcGhRTE1heENvbXBsZXhpdHkiOjAsImdyYXBoUUxNYXhEZXB0aCI6MCwic3RvcE9uUXVvdGFSZWFjaCI6dHJ1ZSwic3Bpa2VBcnJlc3RMaW1pdCI6MCwic3Bpa2VBcnJlc3RVbml0Ijoic2VjIn19LCJrZXl0eXBlIjoiUFJPRFVDVElPTiIsInN1YnNjcmliZWRBUElzIjpbeyJzdWJzY3JpYmVyVGVuYW50RG9tYWluIjoiY2FyYm9uLnN1cGVyIiwibmFtZSI6IlNpdGVTcGVjaWZpY0ZvcmVjYXN0IiwiY29udGV4dCI6Ilwvc2l0ZXNwZWNpZmljXC92MCIsInB1Ymxpc2hlciI6IkphZ3Vhcl9DSSIsInZlcnNpb24iOiJ2MCIsInN1YnNjcmlwdGlvblRpZXIiOiJ3ZGhfc2l0ZV9zcGVjaWZpY19mcmVlIn1dLCJ0b2tlbl90eXBlIjoiYXBpS2V5IiwiaWF0IjoxNzI1NDQ4NTM1LCJqdGkiOiI5MzgwYmViMS1mZGE1LTRiZGMtYWRmYy02OTZkYTQxNDBiZTgifQ==.fb55x5LYvPAW4wHlfzIFJ8PjUXUuiSnZdsCLSO5efu235SeeXF1Z1gv1c0cX3tqBko7bDZv3kNl0d32GyHAuggflinN45-MszERXmKdOjX50MZDLSF7F_N-v-B2woYFFx7DxS3HU3bhfVLtbOEWQBwlcobY2NOSN8q2v6AoY9cfTju7k3wyr0Hk6emuHMtzplQvyXNaeeWSQuWiUUeScSYY9F1yJhR5h2KOmorqQAA3AAoglrx2P_R17o0VgBSw4tFHHwvJ9PMfenh_7ygD1K9-dFd7xOW7zDhnseSkx49dAUhSPRlVYs7rl55_8c9ghavzoX7lhy9P1VfP16J-c9A=='
-        }, 
-        success:function(hourly_result) {
-        console.log(hourly_result);
+// Global vars
+let def_lat = 50.72716722965387
+let def_lon = -3.4751011151717504
+let def_place_name = "Exeter"
 
-    //Get current temperature from datahub
-        var current_temp = hourly_result.features[0].properties.timeSeries[2].screenTemperature;
-        current_temp = Math.round(current_temp);
-        var element = document.getElementById("currentTemp");
-        element.innerHTML = current_temp +'°C';
+//get latitude and longitude co-ordinates from place name
+function get_location(search_input){      
+    return $.ajax({   
+        
+            url: `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&searchExtent=-8,49,2,61&SingleLine=${search_input}`,
 
-    //Get current weather code from datahub
-        var current_weather_code = hourly_result.features[0].properties.timeSeries[2].significantWeatherCode;
-        current_weather_code = current_weather_code.toString();
-        var element = $("#currentWeatherCode");
-        element.innerHTML = current_weather_code;
+            success:function(location_result) {
+                console.log(location_result);
 
-    //Use weather code to append source for corresponding icon        
-        element.attr('src', `images/weather-${current_weather_code}.png`);
-        console.log(current_weather_code);
-        },
-    
+    //obtain place name
+            place_name_response = (location_result).candidates[1].address;
+            place_name = place_name_response.split(',')[0];
+
+    //obtain co-ordinates
+        const location = location_result.candidates[0].location;
+            lat = (location).y;
+            lon = (location).x;            
+            }        
     })
+}
+
+function get_weather_data(_lat,_lon,_place_name){
+    //set place name
+    let place = $("#placeName");
+        place.html(_place_name);
+    //run hourly and daily forecast functions    
+    get_hourly_data(_lat,_lon);
+    get_daily_data(_lat,_lon);
+}
+
+//clear search bar
+function clearSearchInput() {
+    document.getElementById("searchInput").value = "";
+}
+
+ //Obtain dates from datahub, convert to days of the week, and append relevant data
+function get_weekday(day, daily_result) {
+        
+            const day_date = daily_result.features[0].properties.timeSeries[day+1].time;
+    
+            let d = luxon.DateTime.fromISO(day_date);
+            dayOfWeek = d.toFormat('ccc');
+            let element_day = $(`#dayName${day+1}`);
+            element_day.html(dayOfWeek);
+}
+
+//Hourly weather forecast from datahub using obtained co-ordinates
+function get_hourly_data(lat, lon){
+
     $.ajax({
-    //Daily weather forecast from datahub
-        url: "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily?latitude=50.727239&longitude=-3.475277",
+       
+        url: "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly?latitude=" + lat +"&longitude="+ lon,
         headers: {
-            "apikey": 'eyJ4NXQiOiJOak16WWpreVlUZGlZVGM0TUdSalpEaGtaV1psWWpjME5UTXhORFV4TlRZM1ptRTRZV1JrWWc9PSIsImtpZCI6ImdhdGV3YXlfY2VydGlmaWNhdGVfYWxpYXMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJyZWJlY2NhLmhhcmJ1cnlAbWV0b2ZmaWNlLmdvdi51a0BjYXJib24uc3VwZXIiLCJhcHBsaWNhdGlvbiI6eyJvd25lciI6InJlYmVjY2EuaGFyYnVyeUBtZXRvZmZpY2UuZ292LnVrIiwidGllclF1b3RhVHlwZSI6bnVsbCwidGllciI6IlVubGltaXRlZCIsIm5hbWUiOiJzaXRlX3NwZWNpZmljLWI4ZmM2NTUxLWU2MGEtNGI1My04Mzk5LTY1NTVkODczMjdhZiIsImlkIjo2MTI4LCJ1dWlkIjoiMDRjMTE0MWYtZDA2YS00NDM1LWI0YWMtMWE5MTY2YjdmN2YxIn0sImlzcyI6Imh0dHBzOlwvXC9hcGktbWFuYWdlci5hcGktbWFuYWdlbWVudC5tZXRvZmZpY2UuY2xvdWQ6NDQzXC9vYXV0aDJcL3Rva2VuIiwidGllckluZm8iOnsid2RoX3NpdGVfc3BlY2lmaWNfZnJlZSI6eyJ0aWVyUXVvdGFUeXBlIjoicmVxdWVzdENvdW50IiwiZ3JhcGhRTE1heENvbXBsZXhpdHkiOjAsImdyYXBoUUxNYXhEZXB0aCI6MCwic3RvcE9uUXVvdGFSZWFjaCI6dHJ1ZSwic3Bpa2VBcnJlc3RMaW1pdCI6MCwic3Bpa2VBcnJlc3RVbml0Ijoic2VjIn19LCJrZXl0eXBlIjoiUFJPRFVDVElPTiIsInN1YnNjcmliZWRBUElzIjpbeyJzdWJzY3JpYmVyVGVuYW50RG9tYWluIjoiY2FyYm9uLnN1cGVyIiwibmFtZSI6IlNpdGVTcGVjaWZpY0ZvcmVjYXN0IiwiY29udGV4dCI6Ilwvc2l0ZXNwZWNpZmljXC92MCIsInB1Ymxpc2hlciI6IkphZ3Vhcl9DSSIsInZlcnNpb24iOiJ2MCIsInN1YnNjcmlwdGlvblRpZXIiOiJ3ZGhfc2l0ZV9zcGVjaWZpY19mcmVlIn1dLCJ0b2tlbl90eXBlIjoiYXBpS2V5IiwiaWF0IjoxNzI1NDQ4NTM1LCJqdGkiOiI5MzgwYmViMS1mZGE1LTRiZGMtYWRmYy02OTZkYTQxNDBiZTgifQ==.fb55x5LYvPAW4wHlfzIFJ8PjUXUuiSnZdsCLSO5efu235SeeXF1Z1gv1c0cX3tqBko7bDZv3kNl0d32GyHAuggflinN45-MszERXmKdOjX50MZDLSF7F_N-v-B2woYFFx7DxS3HU3bhfVLtbOEWQBwlcobY2NOSN8q2v6AoY9cfTju7k3wyr0Hk6emuHMtzplQvyXNaeeWSQuWiUUeScSYY9F1yJhR5h2KOmorqQAA3AAoglrx2P_R17o0VgBSw4tFHHwvJ9PMfenh_7ygD1K9-dFd7xOW7zDhnseSkx49dAUhSPRlVYs7rl55_8c9ghavzoX7lhy9P1VfP16J-c9A=='
+        "apikey": 'eyJ4NXQiOiJOak16WWpreVlUZGlZVGM0TUdSalpEaGtaV1psWWpjME5UTXhORFV4TlRZM1ptRTRZV1JrWWc9PSIsImtpZCI6ImdhdGV3YXlfY2VydGlmaWNhdGVfYWxpYXMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhbmRyZXcucG95bnR6QG1ldG9mZmljZS5nb3YudWtAY2FyYm9uLnN1cGVyIiwiYXBwbGljYXRpb24iOnsib3duZXIiOiJhbmRyZXcucG95bnR6QG1ldG9mZmljZS5nb3YudWsiLCJ0aWVyUXVvdGFUeXBlIjpudWxsLCJ0aWVyIjoiVW5saW1pdGVkIiwibmFtZSI6InNpdGVfc3BlY2lmaWMtZDllNGQwZDktNTQ2YS00YTg5LWFmOGQtZWJiMzU3OTRmZmFiIiwiaWQiOjYxMzIsInV1aWQiOiJiMGQ0MDAwOC0wNzFkLTRjZmUtYWVmNS05NzE4ZjdlZDBlNjcifSwiaXNzIjoiaHR0cHM6XC9cL2FwaS1tYW5hZ2VyLmFwaS1tYW5hZ2VtZW50Lm1ldG9mZmljZS5jbG91ZDo0NDNcL29hdXRoMlwvdG9rZW4iLCJ0aWVySW5mbyI6eyJ3ZGhfc2l0ZV9zcGVjaWZpY19mcmVlIjp7InRpZXJRdW90YVR5cGUiOiJyZXF1ZXN0Q291bnQiLCJncmFwaFFMTWF4Q29tcGxleGl0eSI6MCwiZ3JhcGhRTE1heERlcHRoIjowLCJzdG9wT25RdW90YVJlYWNoIjp0cnVlLCJzcGlrZUFycmVzdExpbWl0IjowLCJzcGlrZUFycmVzdFVuaXQiOiJzZWMifX0sImtleXR5cGUiOiJQUk9EVUNUSU9OIiwic3Vic2NyaWJlZEFQSXMiOlt7InN1YnNjcmliZXJUZW5hbnREb21haW4iOiJjYXJib24uc3VwZXIiLCJuYW1lIjoiU2l0ZVNwZWNpZmljRm9yZWNhc3QiLCJjb250ZXh0IjoiXC9zaXRlc3BlY2lmaWNcL3YwIiwicHVibGlzaGVyIjoiSmFndWFyX0NJIiwidmVyc2lvbiI6InYwIiwic3Vic2NyaXB0aW9uVGllciI6IndkaF9zaXRlX3NwZWNpZmljX2ZyZWUifV0sInRva2VuX3R5cGUiOiJhcGlLZXkiLCJpYXQiOjE3MjU0NTU2NzEsImp0aSI6ImIwZTY5YmIzLTk0MmYtNGNjOC1hZWMzLTkyNWY5NmIyNmIwZiJ9.NvmvnqIcqN4DOj0xODz6ShDHNbH-cXyNFOnm0bdicw_-Hd2GwLAnNWjhsx1ij31AY1OFwRfkU-FtTaXRKFD2aDAWQMAXdIt58qzsDnDn2OqGKV4UhWajUMU3wYDTcAgiyD-miE19SjYVYtYcUSMlDn07o8ObVGb29YGpNa-zjPgcav8M8te7l1yDz8U1ZwEnk-8aCd4aG434ergj25v5jLV4yDXJqKPgJytMzbN0mTGWYs0J1p3UIVXfFUCQb3OFvz2AvfkxMMHNqAYvoVCKjXCqDlsC5GYTJA9zK03YSaakoeEhKXSoyU_pjLZR_Q3_TwcTPUshl2M7Jgsa5ado8g==',           
+        },
+
+        success:function(hourly_result) {
+            console.log(hourly_result);
+            get_hourly_forecast(hourly_result);
+        }
+    })
+}
+
+//Daily weather forecast from datahub using obtained co-ordinates
+function get_daily_data(lat,lon){
+
+    $.ajax({
+        
+        url: "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily?latitude=" + lat +"&longitude="+ lon,
+        headers: {
+            "apikey": 'eyJ4NXQiOiJOak16WWpreVlUZGlZVGM0TUdSalpEaGtaV1psWWpjME5UTXhORFV4TlRZM1ptRTRZV1JrWWc9PSIsImtpZCI6ImdhdGV3YXlfY2VydGlmaWNhdGVfYWxpYXMiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhbmRyZXcucG95bnR6QG1ldG9mZmljZS5nb3YudWtAY2FyYm9uLnN1cGVyIiwiYXBwbGljYXRpb24iOnsib3duZXIiOiJhbmRyZXcucG95bnR6QG1ldG9mZmljZS5nb3YudWsiLCJ0aWVyUXVvdGFUeXBlIjpudWxsLCJ0aWVyIjoiVW5saW1pdGVkIiwibmFtZSI6InNpdGVfc3BlY2lmaWMtZDllNGQwZDktNTQ2YS00YTg5LWFmOGQtZWJiMzU3OTRmZmFiIiwiaWQiOjYxMzIsInV1aWQiOiJiMGQ0MDAwOC0wNzFkLTRjZmUtYWVmNS05NzE4ZjdlZDBlNjcifSwiaXNzIjoiaHR0cHM6XC9cL2FwaS1tYW5hZ2VyLmFwaS1tYW5hZ2VtZW50Lm1ldG9mZmljZS5jbG91ZDo0NDNcL29hdXRoMlwvdG9rZW4iLCJ0aWVySW5mbyI6eyJ3ZGhfc2l0ZV9zcGVjaWZpY19mcmVlIjp7InRpZXJRdW90YVR5cGUiOiJyZXF1ZXN0Q291bnQiLCJncmFwaFFMTWF4Q29tcGxleGl0eSI6MCwiZ3JhcGhRTE1heERlcHRoIjowLCJzdG9wT25RdW90YVJlYWNoIjp0cnVlLCJzcGlrZUFycmVzdExpbWl0IjowLCJzcGlrZUFycmVzdFVuaXQiOiJzZWMifX0sImtleXR5cGUiOiJQUk9EVUNUSU9OIiwic3Vic2NyaWJlZEFQSXMiOlt7InN1YnNjcmliZXJUZW5hbnREb21haW4iOiJjYXJib24uc3VwZXIiLCJuYW1lIjoiU2l0ZVNwZWNpZmljRm9yZWNhc3QiLCJjb250ZXh0IjoiXC9zaXRlc3BlY2lmaWNcL3YwIiwicHVibGlzaGVyIjoiSmFndWFyX0NJIiwidmVyc2lvbiI6InYwIiwic3Vic2NyaXB0aW9uVGllciI6IndkaF9zaXRlX3NwZWNpZmljX2ZyZWUifV0sInRva2VuX3R5cGUiOiJhcGlLZXkiLCJpYXQiOjE3MjU0NTU2NzEsImp0aSI6ImIwZTY5YmIzLTk0MmYtNGNjOC1hZWMzLTkyNWY5NmIyNmIwZiJ9.NvmvnqIcqN4DOj0xODz6ShDHNbH-cXyNFOnm0bdicw_-Hd2GwLAnNWjhsx1ij31AY1OFwRfkU-FtTaXRKFD2aDAWQMAXdIt58qzsDnDn2OqGKV4UhWajUMU3wYDTcAgiyD-miE19SjYVYtYcUSMlDn07o8ObVGb29YGpNa-zjPgcav8M8te7l1yDz8U1ZwEnk-8aCd4aG434ergj25v5jLV4yDXJqKPgJytMzbN0mTGWYs0J1p3UIVXfFUCQb3OFvz2AvfkxMMHNqAYvoVCKjXCqDlsC5GYTJA9zK03YSaakoeEhKXSoyU_pjLZR_Q3_TwcTPUshl2M7Jgsa5ado8g=='
         }, 
 
         success:function(daily_result) {
-        console.log(daily_result);
+            console.log(daily_result);
         
-    //Get highest temperature forecast for today from datahub
-        var current_high_temp = daily_result.features[0].properties.timeSeries[1].dayMaxScreenTemperature;
-        current_high_temp = Math.round(current_high_temp);
-        var element = document.getElementById("currentHighTemp");
-        element.innerHTML = current_high_temp +'°C';
-
-    //Get lowest temperature forcast for today from datahub
-        var current_low_temp = daily_result.features[0].properties.timeSeries[1].nightMinScreenTemperature;
-        current_low_temp = Math.round(current_low_temp);
-        var element = document.getElementById("currentLowTemp");
-        element.innerHTML = current_low_temp +'°C';
-
-//5 Day Forecast        
-
-    //Get temperature range for Day 1 of forecast from datahub
-        var day1_high_temp = daily_result.features[0].properties.timeSeries[2].dayMaxScreenTemperature;
-        day1_high_temp = Math.round(day1_high_temp);
-        var element = document.getElementById("day1HighTemp");
-        element.innerHTML = day1_high_temp +'°C';
-
-        var day1_low_temp = daily_result.features[0].properties.timeSeries[2].nightMinScreenTemperature;
-        day1_low_temp = Math.round(day1_low_temp);
-        var element = document.getElementById("day1LowTemp");
-        element.innerHTML = day1_low_temp +'°C';
-
-    //Get significant weather code from data hub
-        var day1_weather_code = daily_result.features[0].properties.timeSeries[2].daySignificantWeatherCode;
-        day1_weather_code = day1_weather_code.toString();
-        var element = $("#day1WeatherCode");
-        element.innerHTML = day1_weather_code;
-
-    //Use weather code to append source for corresponding icon
-        element.attr('src', `images/weather-${day1_weather_code}.png`);
-        
-        
-    //Get temperature range for Day 2 of forecast from datahub
-        var day2_high_temp = daily_result.features[0].properties.timeSeries[3].dayMaxScreenTemperature;
-        day2_high_temp = Math.round(day2_high_temp);
-        var element = document.getElementById("day2HighTemp");
-        element.innerHTML = day2_high_temp +'°C';
-
-        var day2_low_temp = daily_result.features[0].properties.timeSeries[3].nightMinScreenTemperature;
-        day2_low_temp = Math.round(day2_low_temp);
-        var element = document.getElementById("day2LowTemp");
-        element.innerHTML = day1_low_temp +'°C';
-
-    //Get significant weather code from data hub
-        var day2_weather_code = daily_result.features[0].properties.timeSeries[3].daySignificantWeatherCode;
-        day2_weather_code = day2_weather_code.toString();
-        var element = $("#day2WeatherCode");
-        element.innerHTML = day2_weather_code;
-
-    //Use weather code to append source for corresponding icon
-        element.attr('src', `images/weather-${day2_weather_code}.png`);
-
-
-    //Get temperature range for Day 3 of forecast from datahub
-        var day3_high_temp = daily_result.features[0].properties.timeSeries[4].dayMaxScreenTemperature;
-        day3_high_temp = Math.round(day3_high_temp);
-        var element = document.getElementById("day3HighTemp");
-        element.innerHTML = day3_high_temp +'°C';
-
-        var day3_low_temp = daily_result.features[0].properties.timeSeries[4].nightMinScreenTemperature;
-        day3_low_temp = Math.round(day3_low_temp);
-        var element = document.getElementById("day3LowTemp");
-        element.innerHTML = day3_low_temp +'°C';
-
-    //Get significant weather code from data hub
-        var day3_weather_code = daily_result.features[0].properties.timeSeries[4].daySignificantWeatherCode;
-        day3_weather_code = day3_weather_code.toString();
-        var element = $("#day3WeatherCode");
-        element.innerHTML = day3_weather_code;
-
-    //Use weather code to append source for corresponding icon
-        element.attr('src', `images/weather-${day3_weather_code}.png`);
-
-
-    //Get temperature range for Day 4 of forecast from datahub
-        var day4_high_temp = daily_result.features[0].properties.timeSeries[5].dayMaxScreenTemperature;
-        day4_high_temp = Math.round(day4_high_temp);
-        var element = document.getElementById("day4HighTemp");
-        element.innerHTML = day4_high_temp +'°C';
-
-        var day4_low_temp = daily_result.features[0].properties.timeSeries[5].nightMinScreenTemperature;
-        day4_low_temp = Math.round(day4_low_temp);
-        var element = document.getElementById("day4LowTemp");
-        element.innerHTML = day4_low_temp +'°C';
-
-    //Get significant weather code from data hub
-        var day4_weather_code = daily_result.features[0].properties.timeSeries[5].daySignificantWeatherCode;
-        day4_weather_code = day4_weather_code.toString();
-        var element = $("#day4WeatherCode");
-        element.innerHTML = day4_weather_code;
-
-    //Use weather code to append source for corresponding icon
-        element.attr('src', `images/weather-${day4_weather_code}.png`);
-
-
-    //Get temperature range for Day 5 of forecast from datahub
-        var day5_high_temp = daily_result.features[0].properties.timeSeries[6].dayMaxScreenTemperature;
-        day5_high_temp = Math.round(day5_high_temp);
-        var element = document.getElementById("day5HighTemp");
-        element.innerHTML = day1_high_temp +'°C';
-
-        var day5_low_temp = daily_result.features[0].properties.timeSeries[6].nightMinScreenTemperature;
-        day5_low_temp = Math.round(day5_low_temp);
-        var element = document.getElementById("day5LowTemp");
-        element.innerHTML = day5_low_temp+'°C';
-
-    //Get significant weather code from data hub
-        var day5_weather_code = daily_result.features[0].properties.timeSeries[6].daySignificantWeatherCode;
-        day5_weather_code = day5_weather_code.toString();
-        var element = $("#day5WeatherCode");
-        element.innerHTML = day5_weather_code;
-
-    //Use weather code to append source for corresponding icon
-        element.attr('src', `images/weather-${day5_weather_code}.png`);
-
-
-        console.log(day1_weather_code, day2_weather_code, day3_weather_code, day4_weather_code, day5_weather_code);
-
-    //I will make this better! :)
-        const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat","Sun","Mon","Tue","Wed","Thurs"];
-
-    //Get Day of the week for today and next 5 days
-        var d = new Date();
-
-        let day = d.getDay();
-        let day1 = day+1
-        let day2 = day+2
-        let day3 = day+3
-        let day4 = day+4
-        let day5 = day+5
-
-
-    //Change from numerical to name of day
-        let dayOfTheWeek = weekday[day];
-        let dayOfTheWeek1 = weekday[day1];
-        let dayOfTheWeek2 = weekday[day2];
-        let dayOfTheWeek3 = weekday[day3];
-        let dayOfTheWeek4 = weekday[day4];
-        let dayOfTheWeek5 = weekday[day5];
-
-    //Put day of the week data into HTML file
-        var element = document.getElementById("dayName");
-        element.innerHTML = dayOfTheWeek;
-        var element = document.getElementById("day1Name");
-        element.innerHTML = dayOfTheWeek1;
-        var element = document.getElementById("day2Name");
-        element.innerHTML = dayOfTheWeek2;
-        var element = document.getElementById("day3Name");
-        element.innerHTML = dayOfTheWeek3;
-        var element = document.getElementById("day4Name");
-        element.innerHTML = dayOfTheWeek4;
-        var element = document.getElementById("day5Name");
-        element.innerHTML = dayOfTheWeek5;
-
+            for (let i =0; i < 6; i++){
+                get_weekday(i, daily_result); //days of the week for today and next 5 days
+                get_daily_forecast(i, daily_result); //Forecast for today and next 5 days
+            }    
         }
-    })    
+    }) 
+}
+
+//Obtain current temp and sig. weather code for today from data hub, and append relevant data
+function get_hourly_forecast(hourly_result){
+        
+    const hourly = hourly_result.features[0].properties.timeSeries[2];
+        
+    //Get current temperature from datahub and append
+        let current_temp = (hourly).screenTemperature;
+        current_temp = Math.round(current_temp);
+        let element4 = $("#currentTemp");
+        element4.html(current_temp +'°C');
+    
+    //Get current weather code from datahub
+        let current_weather_code = (hourly).significantWeatherCode;
+        current_weather_code = current_weather_code.toString();
+        let element5 = $("#currentWeatherCode");
+        element5.innerHTML = current_weather_code;
+    
+    //Use weather code to append source for corresponding icon        
+        element5.attr('src', `images/weather-${current_weather_code}.png`);
+        console.log(current_weather_code);
+}
+
+//Obtain high/low temps and sig. weather code for today and next 5 days from data hub, and append relevant data
+function get_daily_forecast(day, daily_result) {
+            
+    const daily = daily_result.features[0].properties.timeSeries[day+1];
+
+    //high temp
+        let high_temp = (daily).dayMaxScreenTemperature;
+        high_temp = Math.round(high_temp);
+        let element1 = $(`#${day+1}HighTemp`);
+        element1.html(`${high_temp}°C`);
+
+    //low temp        
+        let low_temp = (daily).nightMinScreenTemperature;
+        low_temp = Math.round(low_temp);
+        let element2 = $(`#${day+1}LowTemp`);
+        element2.html(`${low_temp}°C`);                       
+
+
+    //Get significant weather code from data hub
+        let weather_code = (daily).daySignificantWeatherCode;
+        weather_code = weather_code.toString();
+        let element3 = $(`#${day+1}WeatherCode`);
+        element3.innerHTML = weather_code;
+
+    //Use weather code to append source for corresponding icon
+        element3.attr('src', `images/weather-${weather_code}.png`);
+}
+
+
+//******************************************************                Start Weather App               ****************************************************
+$(document).ready(function () {
+
+    //doc ready fires off setting up any event listeners on those elements (like button clicks/submits) (could also wrap all that logic in a function)
+    //doc ready also fires off a loadWeather function for the default location
+        
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+
+        //enter key triggers click of search button
+        searchInput.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  document.getElementById("searchButton").click();
+                }
+            })
+
+        //click search button = search location
+        searchButton.addEventListener('click',
+            async function search() {
+                const search_input = searchInput.value;
+                console.log(search_input);                
+                await get_location(search_input);
+                get_weather_data(lat, lon, place_name);
+                clearSearchInput();
+            }    
+        )
+        
+    // Load default location
+    get_weather_data(def_lat, def_lon, def_place_name);
 })
