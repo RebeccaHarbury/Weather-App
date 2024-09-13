@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
 
-    <meta name ="viewport" contents="width=device-width, initial-scale=1.0">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Weather</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/luxon.min.js"></script>
     <script src="script.js"></script>
 
 </head>
+
 <body>
 
-<div class="card">
+    <div class="card">
 
-    <!--Search bar-->
-    <div class="searchBar">
-        <input type="text"  placeholder="enter city name" id="searchInput" spellcheck="false">
-        <button><img src="images/search-icon.png" id="searchButton"></button>
-    </div>
+        <!--Search bar-->
+        <div class="searchBar">
+            <input type="text" placeholder="enter city name" id="searchInput" spellcheck="false">
+            <button><img src="images/search-icon.png" id="searchButton"></button>
+        </div>
 
-    <!--Displays name of city, icon of current significant weather, and day of the week-->
-    <div class="weather">
-        <h1 class="city" id="placeName"></h1>
-        <img src="images/nothing.png" class="weather-icon" id="currentWeatherCode">
-        <h2 id="dayName1"><h2>
-    </div>
+        <!--Displays name of city, icon of current significant weather, and day of the week-->
+        <div class="weather">
+            <h1 id="placeName"></h1>
+            <img src="images/nothing.png" class="weather-icon" id="currentWeatherCode">
+            <h2 id="dayName1"><h2>
+        </div>
 
-    <!--Displays forcasted current, highest, and lowest temperatures for the current day-->
-    <div class="temp">
-        <h1 class="currentTemp"> <p id="currentTemp"></p></h1>
-        <h3 class="highTemp1"> <img src="images/up-arrow.png" id="up1"/><span id="1HighTemp"></span></h3>
-        <h3 class="lowTemp1"> <img src="images/down-arrow.png" id="down1"/><span id="1LowTemp"></span></h3>
-    </div>
+        <!--Displays forcasted current, highest, and lowest temperatures for the current day-->
+        <div class="temp">
+            <h1 id="currentTemp"></h1>
+            <h3> <img src="images/up-arrow.png" id="up" /><span id="1HighTemp"></span></h3>
+            <h3> <img src="images/down-arrow.png" id="down" /><span id="1LowTemp"></span></h3>
+        </div>
 
-    <!--5 day forcast, displaying weather icon and highest/lowest forcasted temperatures for the next 5 days-->
-    <div class="forecast" id="forecast">
-                                               
+        <!--5 day forcast, displaying weather icon and highest/lowest forcasted temperatures for the next 5 days-->
+        <div class="forecast" id="forecast">
+
+        </div>
     </div>
-</div>
 </body>
+
 </html>

@@ -145,9 +145,9 @@ function html_data() {
 
         const p = $(`<div>
             <p id="dayName${i + 1}"></p>
-            <p className="day${i}"><img src="images/nothing.png" id="${i + 1}WeatherCode" width="45%"></p>
-            <p className="hightemp"><img src="images/up-arrow.png" id="up" height="14px"/><span id="${i + 1}HighTemp"></span></p>
-            <p className="lowtemp"><img src="images/down-arrow.png" id="down" height="14px"/><span id="${i + 1}LowTemp"></span></p>
+            <p><img src="images/nothing.png" id="${i + 1}WeatherCode" width="45%"></p>
+            <p><img src="images/up-arrow.png" id="up" height="14px"/><span id="${i + 1}HighTemp"></span></p>
+            <p><img src="images/down-arrow.png" id="down" height="14px"/><span id="${i + 1}LowTemp"></span></p>
             </div>`);
         div.append(p);
     }
